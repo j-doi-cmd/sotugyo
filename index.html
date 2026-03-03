@@ -182,6 +182,15 @@ $("shutterBtn").addEventListener("click", ()=>{
   $("downloadLink").style.display = "inline-block";
   msg("撮影しました。下にプレビューが出ます。『画像を保存』で保存できます。");
 });
+  /* 縦向き（portrait）では高さが足りなくなるので、撮影エリアを少し小さくする */
+@media (orientation: portrait) {
+  .stage{
+    width: min(92vw, 420px);   /* ←520px→420pxに縮める */
+    margin: 8px auto;
+  }
+  .caption{ font-size:18px; margin-top:8px; }
+  button{ font-size:15px; padding:10px 14px; }
+}
 </script>
 </body>
 </html>

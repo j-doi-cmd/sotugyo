@@ -5,74 +5,95 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>卒業フォトフレーム</title>
 <style>
-  body {
-    margin:0;
-    background:#000;
-    color:#fff;
-    font-family:sans-serif;
+  body{
+    margin:0; background:#000; color:#fff;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
     text-align:center;
   }
 
-  .container {
+  /* 画面内に必ず収める（iPhone対策） */
+  .stage{
+    width:min(92vw, 520px);
+    margin:14px auto 0;
+  }
+
+  /* ポラロイド全体の表示領域：index2.png の縦横比に合わせるのが理想
+     まずは 3:4 で置いて、合わなければ数値を変える */
+  .polaroid{
     position:relative;
     width:100%;
-    max-width:520px;
-    margin:20px auto;
+    aspect-ratio: 3 / 4; /* ←ここ後で調整可 */
   }
 
-  video {
-    width:100%;
-    border-radius:8px;
-  }
-
-  .polaroid {
+  /* 写真の“窓”の位置とサイズ（%指定で調整しやすく） */
+  .window{
     position:absolute;
-    top:0;
-    left:0;
+    left: var(--win-left, 9%);
+    top:  var(--win-top, 10%);
+    width:var(--win-width, 82%);
+    height:var(--win-height, 70%);
+    overflow:hidden;
+    border-radius: 6px;
+    background:#111;
+  }
+
+  .window video{
     width:100%;
     height:100%;
+    object-fit:cover;      /* 窓いっぱいに */
+    transform: scaleX(-1); /* 前面カメラの鏡を自然に */
+  }
+
+  /* フレーム画像は“全体”に重ねる */
+  .frame{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:contain; /* 画面よりデカくならない */
     pointer-events:none;
   }
 
-  .caption {
-    position:absolute;
-    bottom:5%;
-    width:100%;
-    text-align:center;
-    font-size:22px;
-    font-weight:bold;
-    color:#333;
+  .caption{
+    margin-top:10px;
+    font-size:20px;
+    font-weight:700;
   }
 
-  button {
-    margin:15px;
-    padding:12px 20px;
+  button{
+    margin:12px 0 6px;
+    padding:12px 18px;
     font-size:16px;
   }
 
-  #msg {
-    font-size:14px;
-    padding-bottom:20px;
+  #msg{
+    white-space:pre-wrap;
+    font-size:13px;
+    opacity:.9;
+    padding:0 12px 16px;
   }
 </style>
 </head>
 <body>
+  <div class="stage">
+    <div class="polaroid"
+      style="
+        --win-left: 9%;
+        --win-top: 10%;
+        --win-width: 82%;
+        --win-height: 70%;
+      ">
+      <div class="window">
+        <video id="video" autoplay playsinline muted></video>
+      </div>
+      <img class="frame" src="index2.png" alt="frame">
+    </div>
 
-<h2>📸 卒業フォトフレーム</h2>
+    <div class="caption">🎓 卒業おめでとう！</div>
 
-<div class="container">
-  <video id="video" autoplay playsinline muted></video>
-
-  <!-- ポラロイド枠（透過PNG推奨） -->
- <img class="overlay" src="index2.png" alt="frame">
-
-  <div class="caption">
-    🎓 卒業おめでとう！
+    <button id="startBtn">カメラを起動</button>
+    <div id="msg"></div>
   </div>
-</div>
-
-<button id="startBtn">カメラを起動</button>
-<div id="msg"></div>
 
 <script>
 const msg = (t) => document.getElementById("msg").textContent = t;
@@ -86,10 +107,9 @@ document.getElementById("startBtn").addEventListener("click", async () => {
     document.getElementById("video").srcObject = stream;
     msg("カメラ起動OK");
   } catch (e) {
-    msg("カメラ起動失敗：" + e.message);
+    msg("カメラ起動に失敗：\n" + (e?.name ? e.name + " / " : "") + (e?.message ?? e));
   }
 });
 </script>
-
 </body>
 </html>
